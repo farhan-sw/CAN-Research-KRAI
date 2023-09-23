@@ -21,6 +21,7 @@ DigitalOut led(LED1);
 #else
 bool led;
 #endif
+
 //======================================================================
 // CAN BUS Setup=========================================================
 CAN can(PA_11, PA_12,200000);
@@ -59,16 +60,24 @@ int main()
     {
         if (us_ticker_read() - send_timer > 50000)
         {
+            speed1 -=1;
+            speed2 -=1;
+            speed3 -=1;
+            speed4 -=1;
+            micon.sendspeedall(speed1,speed2,speed3,speed4);
             if (micon.sendspeedall(speed1, speed2, speed3, speed4))
             {
                 led = !led;
             };
             micon.sendangleall(angle1, angle2, angle3, angle4);
-            
+            printf("M %d %d %d %d %d %d %d %d\n", speed1, angle1, speed2, angle2, speed3, angle3, speed4, angle4);
             send_timer = us_ticker_read();
+            // led =1;
         }
-
-        printf("M %d %d %d %d %d %d %d %d\n", speed1, angle1, speed2, angle2, speed3, angle3, speed4, angle4);
+        // if (us_ticker_read() - read_timer > 5000)
+        // {
+        //     micon.masterreadmsg(&speed1,&angle1,&speed2,&angle2,&speed3,&angle3,&speed4,&angle4);
+        // }
     }
     return 0;
 }

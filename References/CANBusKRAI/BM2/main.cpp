@@ -4,9 +4,8 @@
  */
 
 #include "mbed.h"
-#include "../CanBusKRAI/canKRAI.hpp"
-
-#define NO_MICON 3
+#include "MBED.h"
+#include "../CanBusKRAI/canBMKRAI.hpp"
 
 // Printing through USB Cable============================================
 // bisar bisa pake printf
@@ -20,33 +19,37 @@ FileHandle *mbed::mbed_override_console(int fd)
 //======================================================================
 // buat lampu bisa blink"
 #ifdef LED1
-DigitalOut led(PC_13);
+DigitalOut led(LED1);
 #else
 bool led;
 #endif
+
 //======================================================================
 // CAN BUS Setup=========================================================
 CAN can(PA_11, PA_12,CAN_BAUD_RATE);
-canKRAI micon;
-
+canBMKRAI micon;
 // CAN Message Setup
+
 uint32_t send_timer = 0;
 uint32_t read_timer = 0;
+uint32_t try_timer = 0;
+uint32_t reset = 0;
 //=======================================================================
 
 int main()
 {
-    int speed = 0;
-    int angle = 0;
+    float data = 0;
+    int data_id = 1;
+    int id = 1;
     read_timer = us_ticker_read();
     send_timer = us_ticker_read();
     while (1)
     {
         if (us_ticker_read() - read_timer > 5000)
         {
-            micon.readmsg(&speed, &angle, NO_MICON);
+            micon.readmsg64(&data, data_id, id);
             read_timer = us_ticker_read();
-            printf("Terima: %d %d %d\n",NO_MICON,speed,angle);
+            printf("Terima: %f %d %d\n",data,data_id,id);
         }
         // if (us_ticker_read() - send_timer > 50000)
         // {
